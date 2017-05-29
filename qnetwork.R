@@ -233,7 +233,7 @@ action<-c("left","right","down","up")
   qn1<-nn.bp(qn1)
 
   
-  ## totail reward
+  ## total reward
   total_r<-total_r+re_ep[1] 
   
   ## episode end??
