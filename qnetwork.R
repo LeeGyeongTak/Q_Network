@@ -62,8 +62,7 @@ next_where<-function(index){
 #######state matrix 
 stm<-matrix(1:100,ncol=10,nrow=10,byrow=T)
 
-
-return_reward<-function(state){
+return_reward<-function(state,current_state){
   re_index<-which(state==1)
   
   if(  re_index==100){
@@ -71,7 +70,7 @@ return_reward<-function(state){
     done<-T
   }
   else if(re_index==12 | re_index==20|re_index==31|re_index==38|
-          re_index==42|re_index==44|re_index==45     |re_index==50|re_index==61|re_index==66 |
+          re_index==42|re_index==44|re_index==45    |
           re_index==68|re_index==72|re_index==80){
     reward<- -5 
     done<-F
@@ -79,12 +78,10 @@ return_reward<-function(state){
     reward <- -1
     done<-F
   }
-  
-  xx<-ceiling(re_index/ 10) ## row
-  yy<-re_index %% 10  ## col
-  yy<-ifelse(yy ==0,10,yy)
-  reward_weight<-sqrt(162)-sqrt((yy-10)^2+(xx-10)^2) #weigthed reward by distance from current state to goal
-  reward<-reward+reward_weight*0.05
+  if(re_index==which(current_state==1)){
+    reward<-reward*2
+  }
+
   c(reward,done)
   
 }
@@ -95,9 +92,9 @@ action<-c("left","right","down","up")
 # FHFFF|FFFFH
 # FFFFF|FFFFF
 # HFFFF|FFHFF
-# FHFHH|FFFFH
+# FHFHH|FFFFF
 # FFFFF|FFFFF
-# HFFFF|HFHFF
+# FFFFF|FFHFF
 # FHFFF|FFFFH
 # FFFFF|FFFFF
 # FFFFF|FFFFG
@@ -199,7 +196,7 @@ for(i in 1:10000){
     da<-diag(100)
     diag(da)<-next_state
     qn2<-nn.ff2(qn1,da)
-    re_ep<-return_reward(next_state) ## get a reward and Whether the episode ends for action(next state)
+    re_ep<-return_reward(next_state,current_state) ## get a reward and Whether the episode ends for action(next state)
     qv<-qn2$post[[length(qn2$size)]] 
     
     if(state_index==100){ ## if episonde done
@@ -272,6 +269,7 @@ for(i in 1:10000){
   }
   
 }
+
 
   
   ts.plot(step_list,main="step")
